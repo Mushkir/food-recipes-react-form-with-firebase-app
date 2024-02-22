@@ -1,0 +1,5 @@
+Workflow:
+    1. Design UI - Done.
+    2. Do the form validation. - Done.
+    3. Create Database.
+    4. Do the Add, Get Operations.
