@@ -9,7 +9,7 @@ import { z } from "zod";
 import { collection, addDoc, getDocs } from "firebase/firestore";
 // import { useEffect } from "react";
 import { db } from "./firebase/index";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const schema = z.object({
   foodName: z
@@ -53,17 +53,21 @@ const App = () => {
     console.log(data);
   };
 
-  // useEffect(() => {
-  //   async function getDataFromFirebase() {
-  //     const querySnapshot = await getDocs(collection(db, "users"));
-  //     querySnapshot.forEach((doc) => {
-  //       // console.log(`${doc.id} => ${doc.data()}`);
-  //       console.log(doc);
-  //     });
-  //   }
+  const [recipe, setRecipe] = useState([]);
 
-  //   getDataFromFirebase();
-  // }, []);
+  useEffect(() => {
+    async function getDataFromFirebase() {
+      const querySnapshot = await getDocs(collection(db, COLLECTION));
+
+      setRecipe(querySnapshot.docs.map((doc) => doc.data()));
+      querySnapshot.forEach((doc) => {
+        // console.log(`${doc.id} => ${doc.data()}`);
+        console.log(doc.data());
+      });
+    }
+
+    getDataFromFirebase();
+  }, []);
 
   return (
     <div className="font-Sen">
@@ -118,6 +122,55 @@ const App = () => {
             Submit
           </button>
         </form>
+
+        <div className="relative overflow-x-auto p-10 shadow-md sm:rounded-lg">
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <tr className="bg-[#A87C7C] text-white">
+                <th scope="col" className="px-6 py-3">
+                  Food name
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Category
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Description
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  URL
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Author
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {recipe.map((doc) => {
+                return (
+                  <tr
+                    key={doc.id}
+                    className="bg-white border-b bg-[##cab0b0] hover:bg-[#cab0b0] hover:text-white"
+                  >
+                    <td
+                      scope="row"
+                      className="px-6 py-4 font-medium text-black whitespace-nowrap"
+                    >
+                      {doc.foodName}
+                    </td>
+                    <td className="px-6 py-4 text-black ">
+                      {doc.foodCategory}
+                    </td>
+                    <td className="px-6 py-4 text-black ">{doc.desc}</td>
+                    <td className="px-6 py-4 text-black ">
+                      {doc.foodUrl == "" ? doc.foodUrl : "URL is not provided."}
+                    </td>
+                    <td className="px-6 py-4 text-black ">{doc.author}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
